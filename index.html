@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Conquest Simulator</title>
+    <style>
+        body { margin: 0; background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #game-container { display: flex; padding: 20px; gap: 20px; }
+        canvas { border: 2px solid #555; background: #000; cursor: crosshair; image-rendering: pixelated; }
+        #stats-panel { width: 300px; background: #333; padding: 20px; border-radius: 8px; }
+        .stat { margin-bottom: 15px; font-size: 1.2rem; }
+        button { background: #4CAF50; border: none; color: white; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #45a049; }
+        h2 { margin-top: 0; color: #4CAF50; }
+    </style>
+</head>
+<body>
+
+    <h1>Country Simulator Alpha</h1>
+
+    <div id="game-container">
+        <canvas id="mapCanvas" width="600" height="400"></canvas>
+
+        <div id="stats-panel">
+            <h2>Country Stats</h2>
+            <div class="stat">Money: $<span id="money">1000</span></div>
+            <div class="stat">Population: <span id="pop">5000</span></div>
+            <div class="stat">Land Owned: <span id="land">0</span>%</div>
+            <hr>
+            <button onclick="collectTaxes()">Collect Taxes</button>
+            <br><br>
+            <button onclick="expandTerritory()">Expand Territory ($500)</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameState = {
+            money: 1000,
+            population: 5000,
+            landOwned: 0
+        };
+
+        // 1. Generate a random "World Map"
+        function drawMap() {
+            const tileSize = 5;
+            for (let x = 0; x < canvas.width; x += tileSize) {
+                for (let y = 0; y < canvas.height; y += tileSize) {
+                    // Simple "noise" logic for terrain
+                    let val = Math.random();
+                    if (val > 0.98) ctx.fillStyle = "#fff"; // Mountains
+                    else if (val > 0.6) ctx.fillStyle = "#2d5a27"; // Forest/Land
+                    else ctx.fillStyle = "#1e3f66"; // Water
+                    
+                    ctx.fillRect(x, y, tileSize, tileSize);
+                }
+            }
+        }
+
+        // 2. Game Logic Functions
+        function updateUI() {
+            document.getElementById('money').innerText = gameState.money;
+            document.getElementById('pop').innerText = gameState.population;
+            document.getElementById('land').innerText = gameState.landOwned;
+        }
+
+        function collectTaxes() {
+            let earnings = Math.floor(gameState.population * 0.1);
+            gameState.money += earnings;
+            alert("Collected $" + earnings + " in taxes!");
+            updateUI();
+        }
+
+        function expandTerritory() {
+            if (gameState.money >= 500) {
+                gameState.money -= 500;
+                gameState.landOwned += 2;
+                gameState.population += 1000;
+                
+                // Visual feedback: Draw a "city" dot on the map
+                ctx.fillStyle = "#ff0000";
+                ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 8, 8);
+                
+                updateUI();
+            } else {
+                alert("Not enough money!");
+            }
+        }
+
+        // Initialize
+        drawMap();
+        updateUI();
+
+    </script>
+</body>
+</html>
